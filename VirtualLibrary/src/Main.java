@@ -27,7 +27,7 @@ class Administration {
                 else {
                     mainMenu();
                 }
-                ;
+
                 break;
             // admin login
             case 'a':
@@ -37,7 +37,7 @@ class Administration {
                 else {
                     mainMenu();
                 }
-                ;break;
+                break;
             // register new user
             case 'r':
                 regUser();
@@ -67,7 +67,7 @@ class Administration {
             case 'd':
                 if (deleteBook()){
                     System.out.println("book deleted");
-                };
+                }
                 adminMenu();
 
                 // exit system
@@ -89,15 +89,15 @@ class Administration {
                 // if book exists - load rent menu
                 if (book!=null){
                     rentMenu(user, book);
-                };
+                }
                 userMenu(user);
 
                 break;
             case 'm':
                 if (user.makeDeposit()){
                     System.out.println("Deposit made successfuly!");
-                    System.out.println("Current amount:"+user.deposit);
-                };
+                    System.out.println("Current amount:"+user.getDeposit());
+                }
                 userMenu(user);
                 break;
             case 'e': System.exit(0);break;
@@ -138,9 +138,9 @@ class Administration {
 
                 BufferedWriter fw = new BufferedWriter(
                         new FileWriter("users/users.txt", true));
-                fw.append(user.uid+","+user.nickname+"\n");
+                fw.append(user.getUid()+","+user.getNickname()+"\n");
                 fw.close();
-                FileOutputStream userfile = new FileOutputStream("users/"+String.valueOf(user.uid)+".ser");
+                FileOutputStream userfile = new FileOutputStream("users/"+String.valueOf(user.getUid())+".ser");
                 ObjectOutputStream out = new ObjectOutputStream(userfile);
                 out.writeObject(user);
                 out.close();
@@ -191,7 +191,7 @@ class Administration {
                 FileInputStream fileIn = new FileInputStream("users/"+uid+".ser");
                 ObjectInputStream in = new ObjectInputStream(fileIn);
                 User user = (User) in.readObject();
-                System.out.println("Here we have a user"+user.uid);
+                System.out.println("Here we have a user"+user.getUid());
 
                 in.close();
                 fileIn.close();
@@ -291,9 +291,9 @@ class Administration {
             BufferedWriter catalogue = new BufferedWriter(
                     new FileWriter("books/catalogue.txt", true));
             //FileWriter catalogue = new FileWriter();
-            catalogue.append(book.isbn+","+book.title+"\n");
+            catalogue.append(book.getIsbn()+","+book.getTitle()+"\n");
             FileOutputStream fileOut =
-                    new FileOutputStream("books/"+book.isbn+".ser");
+                    new FileOutputStream("books/"+book.getIsbn()+".ser");
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(book);
             out.close();
@@ -420,9 +420,11 @@ class Administration {
 
     // Method to rent a book
     public static void rentBook(User user, Book book){
-        if (user.deposit>=2){
-            user.deposit-=2;
-            System.out.println(book.content);
+        double userMoney = user.getDeposit();
+        if (userMoney>=2){
+            userMoney-=2;
+            user.setDeposit(userMoney);
+            System.out.println(book.getContent());
         }
         else{
             System.out.println("Not enough money in deposit");
@@ -433,12 +435,12 @@ class Administration {
 // We make User class Serializable because we are going to save obj in file
 class User implements java.io.Serializable {
 
-    public String uid;
-    public String nickname;
+    private String uid;
+    private String nickname;
     private String password;
-    public LocalDateTime regDate;
-    public String email;
-    public double deposit;
+    private LocalDateTime regDate;
+    private String email;
+    private double deposit;
 
 
     public User (String nick, String pass, String email){
@@ -449,6 +451,34 @@ class User implements java.io.Serializable {
         this.email=email;
         this.regDate = LocalDateTime.now();
         this.deposit=0;
+    }
+
+    public void setDeposit(double deposit) {
+        this.deposit = deposit;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public LocalDateTime getRegDate() {
+        return regDate;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public double getDeposit() {
+        return deposit;
     }
 
     // Method to validate password
@@ -505,10 +535,10 @@ class User implements java.io.Serializable {
 
 class Book implements java.io.Serializable {
 
-    public String isbn;
-    public String title;
-    public String author;
-    public String content;
+    private String isbn;
+    private String title;
+    private String author;
+    private String content;
 
     public Book(String isbn, String title, String author, String content){
 
@@ -519,6 +549,21 @@ class Book implements java.io.Serializable {
 
     }
 
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getContent() {
+        return content;
+    }
 }
 
 
